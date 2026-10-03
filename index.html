@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>Ariyan Rayhan — Digital Identity</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+background:linear-gradient(145deg,#0f172a,#111827 48%,#334155);color:#fff;min-height:100vh}
+.wrap{max-width:520px;margin:auto;padding:28px 18px 36px}
+.card{background:rgba(255,255,255,.09);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);
+border-radius:30px;padding:28px 20px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.avatar{width:145px;height:145px;border-radius:50%;object-fit:cover;display:block;margin:2px auto 17px;
+border:4px solid rgba(255,255,255,.9);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+h1{text-align:center;margin:0;font-size:29px}
+.handle{text-align:center;color:#cbd5e1;margin:7px 0 24px}
+.subtitle{text-align:center;color:#e5e7eb;margin-bottom:22px}
+.actions{display:grid;gap:11px}
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;color:#fff;
+padding:14px 16px;border-radius:16px;font-weight:700;background:rgba(255,255,255,.12);
+border:1px solid rgba(255,255,255,.12);font-size:15px}
+.primary{background:#fff;color:#111827}
+.info{margin-top:22px;padding:16px;border-radius:18px;background:rgba(0,0,0,.16);line-height:1.75;color:#e5e7eb}
+.label{color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.footer{text-align:center;color:#94a3b8;font-size:12px;margin-top:18px}
+
+.qrbox{margin-top:24px;padding:18px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.qrtitle{text-align:center;font-size:20px;font-weight:800;margin-bottom:6px}
+.qrhint{text-align:center;color:#cbd5e1;font-size:13px;margin-bottom:14px}
+#reader{width:100%;max-width:420px;margin:auto;border-radius:16px;overflow:hidden}
+.scanbtn{margin-top:12px;width:100%;border:0;cursor:pointer}
+#scanStatus{text-align:center;color:#cbd5e1;font-size:13px;margin-top:10px;min-height:20px}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+<img class="avatar" src="profile.jpg" alt="Ariyan Rayhan">
+<h1>Ariyan Rayhan</h1>
+<div class="handle">@ariyanchowdhury99</div>
+<div class="subtitle">Digital Identity Profile</div>
+<div class="actions">
+<a class="btn primary" href="tel:+8801825750872">📞 Call</a>
+<a class="btn" href="https://wa.me/8801825750872">💬 WhatsApp</a>
+<a class="btn" href="https://www.instagram.com/ariyanchowdhury99/" target="_blank">📸 Instagram</a>
+<a class="btn" href="https://www.facebook.com/search/top?q=আরিয়ান রায়হান" target="_blank">👤 Facebook</a>
+<button class="btn" onclick="saveContact()">💾 Save Contact</button>
+<a class="btn" href="https://www.google.com/maps/search/?api=1&query=Pabna%20Hemayetpur%20Islampur" target="_blank">📍 Location</a>
+</div>
+
+<section class="qrbox">
+  <div class="qrtitle">📷 QR Scanner</div>
+  <div class="qrhint">QR কোড স্ক্যান করলেই তার লিংকে চলে যাবে</div>
+  <div id="reader"></div>
+  <button class="btn primary scanbtn" id="startScan">▶️ Scanner চালু করুন</button>
+  <div id="scanStatus"></div>
+</section>
+<section class="info">
+<div class="label">Phone</div>01825750872<br>
+<div class="label" style="margin-top:8px">Address</div>Pabna, Hemayetpur, Islampur
+</section>
+<div class="footer">Digital Identity • Ariyan Rayhan</div>
+</main></div>
+<script>
+function saveContact(){
+const v=`BEGIN:VCARD\nVERSION:3.0\nFN:Ariyan Rayhan\nTEL;TYPE=CELL:+8801825750872\nURL:https://www.instagram.com/ariyanchowdhury99/\nEND:VCARD`;
+const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([v],{type:'text/vcard'}));
+a.download='Ariyan_Rayhan.vcf'; a.click();
+}
+</script>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+let scanner = null;
+
+document.getElementById("startScan").addEventListener("click", async function(){
+  const status = document.getElementById("scanStatus");
+  const reader = document.getElementById("reader");
+  this.disabled = true;
+  status.textContent = "ক্যামেরার অনুমতি দিন…";
+
+  try {
+    scanner = new Html5Qrcode("reader");
+    await scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 240, height: 240 } },
+      async (decodedText) => {
+        status.textContent = "লিংক পাওয়া গেছে…";
+        try { await scanner.stop(); } catch(e) {}
+        if (/^https?:\/\//i.test(decodedText)) {
+          window.location.href = decodedText;
+        } else {
+          status.textContent = "এই QR-এ বৈধ ওয়েব লিংক নেই।";
+          this.disabled = false;
+        }
+      },
+      () => {}
+    );
+    status.textContent = "QR কোড ক্যামেরার সামনে ধরুন…";
+  } catch (e) {
+    status.textContent = "ক্যামেরা চালু করা যায়নি। HTTPS ব্যবহার করে Camera permission দিন।";
+    this.disabled = false;
+  }
+});
+</script>
+</body></html>
